@@ -74,21 +74,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Light background via CSS (main + sidebar)
-st.markdown(
-    """
-    <style>
-    [data-testid="stAppViewContainer"] {
-        background-color: #f7f7f9;
-    }
-    [data-testid="stSidebar"] {
-        background-color: #ffffff;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 st.title("QualSteam Performance – Real Dairy")
 
 st.markdown(
@@ -101,7 +86,9 @@ st.markdown(
     """
 )
 
+# ======================
 # Sidebar: batch selection
+# ======================
 st.sidebar.header("Batch Selection")
 
 if batch_df.empty:
@@ -156,14 +143,11 @@ if isinstance(core_start, pd.Timestamp) and isinstance(core_end, pd.Timestamp):
 # ======================
 # Compute KPIs (no valve KPIs)
 # ======================
-# 1) Batch duration (already have)
-# 2) Core duration
 if core_db is not None:
     core_duration_str = format_duration(core_start, core_end)
 else:
     core_duration_str = "N/A"
 
-# 3) Mean absolute temp deviation vs SP in core
 mean_abs_temp_dev = None
 max_overshoot = None
 mean_flow_core = None
@@ -180,12 +164,11 @@ if core_db is not None:
         press_diff = core_db["Outlet Steam Pressure"] - core_db["Pressure SP"]
         mean_abs_press_dev = press_diff.abs().mean()
 
-# 4) Estimated total steam used during batch (simple trapezoidal integration)
+# Estimated total steam during batch
 total_steam_batch = None
 if "Steam Flow Rate" in db.columns and len(db) > 1:
     db_sorted = db.sort_values("Timestamp")
     dt_hours = db_sorted["Timestamp"].diff().dt.total_seconds() / 3600.0
-    # average flow between points
     flow_avg = (db_sorted["Steam Flow Rate"].shift(1) + db_sorted["Steam Flow Rate"]) / 2.0
     mass = (flow_avg * dt_hours).fillna(0.0)
     total_steam_batch = mass.sum()
@@ -264,7 +247,7 @@ fig.add_trace(
         y=db["Process Temp SP"],
         mode="lines",
         name="Process Temp SP",
-        line=dict(color="black", dash="dash"),
+        line=dict(color="#FFD700", dash="dash"),  # bright gold
     ),
     row=1,
     col=1,
@@ -352,3 +335,4 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
