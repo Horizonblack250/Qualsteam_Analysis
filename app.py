@@ -149,7 +149,8 @@ else:
     core_duration_str = "N/A"
 
 mean_abs_temp_dev = None
-max_overshoot = None
+max_overshoot = None  # keep variable defined but we won't compute/display it
+
 mean_flow_core = None
 mean_abs_press_dev = None
 
@@ -157,7 +158,8 @@ if core_db is not None:
     if "Process Temp" in core_db.columns and "Process Temp SP" in core_db.columns:
         temp_diff = core_db["Process Temp"] - core_db["Process Temp SP"]
         mean_abs_temp_dev = temp_diff.abs().mean()
-        max_overshoot = temp_diff.clip(lower=0).max()
+        # Max temp overshoot calculation intentionally disabled per request:
+        # max_overshoot = temp_diff.clip(lower=0).max()
     if "Steam Flow Rate" in core_db.columns:
         mean_flow_core = core_db["Steam Flow Rate"].mean()
     if "Outlet Steam Pressure" in core_db.columns and "Pressure SP" in core_db.columns:
@@ -195,10 +197,11 @@ if mean_abs_temp_dev is not None:
 else:
     kpi_row2[0].metric("Mean |Temp - SP| (core)", "N/A")
 
-if max_overshoot is not None:
-    kpi_row2[1].metric("Max Temp Overshoot (core)", f"{max_overshoot:.2f} °C")
-else:
-    kpi_row2[1].metric("Max Temp Overshoot (core)", "N/A")
+# Max Temp Overshoot metric removed/commented out per request:
+# if max_overshoot is not None:
+#     kpi_row2[1].metric("Max Temp Overshoot (core)", f"{max_overshoot:.2f} °C")
+# else:
+#     kpi_row2[1].metric("Max Temp Overshoot (core)", "N/A")
 
 if mean_flow_core is not None:
     kpi_row2[2].metric("Mean Steam Flow (core)", f"{mean_flow_core:.1f} kg/h")
@@ -335,4 +338,3 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-
