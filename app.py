@@ -250,7 +250,7 @@ fig.add_trace(
         y=db["Process Temp SP"],
         mode="lines",
         name="Process Temp SP",
-        line=dict(color="#FFD700", dash="dash"),  # bright gold
+        line=dict(color="#4A4A4A", dash="dash"),  # bright gold
     ),
     row=1,
     col=1,
